@@ -1,0 +1,127 @@
+---
+import { getCollection, render } from 'astro:content';
+import '../styles/global.css';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const { title, description, date } = post.data;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const formattedDate = new Date(date).toLocaleDateString('en-US', {
+  year: 'numeric', month: 'long', day: 'numeric'
+});
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description,
+  datePublished: date,
+  dateModified: date,
+  author: { '@type': 'Organization', name: 'ReadyList', url: 'https://getreadylist.app' },
+  publisher: { '@type': 'Organization', name: 'ReadyList', url: 'https://getreadylist.app' },
+  mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalURL },
+});
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title} — ReadyList</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonicalURL} />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonicalURL} />
+  <meta property="og:site_name" content="ReadyList" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <script type="application/ld+json" set:html={jsonLd} />
+</head>
+<body class="bg-white min-h-screen">
+
+  <!-- Nav -->
+  <nav class="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur">
+    <div class="mx-auto max-w-3xl px-4 py-4 flex items-center justify-between">
+      <a href="https://getreadylist.app" class="flex items-center gap-2">
+        <span class="text-lg font-black tracking-tight bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+          ✅ ReadyList
+        </span>
+      </a>
+      <a href="/blog" class="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+        ← All articles
+      </a>
+    </div>
+  </nav>
+
+  <article class="mx-auto max-w-3xl px-4 py-12">
+    <!-- Article header -->
+    <header class="mb-10">
+      <div class="mb-4 flex items-center gap-3">
+        <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+          Packing
+        </span>
+        <time class="text-sm text-gray-500" datetime={date}>{formattedDate}</time>
+      </div>
+      <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl leading-tight mb-4">
+        {title}
+      </h1>
+      <p class="text-lg text-gray-500 leading-relaxed">{description}</p>
+    </header>
+
+    <!-- Above-fold CTA -->
+    <div class="mb-10 rounded-2xl p-6 text-white" style="background: linear-gradient(135deg, #2563eb, #06b6d4)">
+      <p class="text-sm font-semibold uppercase tracking-wide opacity-80 mb-1">Use this as a live checklist</p>
+      <p class="text-lg font-bold mb-4">Assign tasks to each person. Everyone tracks their own progress.</p>
+      <a
+        href="https://getreadylist.app"
+        class="inline-block rounded-lg bg-white px-5 py-2.5 text-sm font-bold text-blue-700 hover:bg-blue-50 transition-colors"
+      >
+        Try ReadyList free →
+      </a>
+    </div>
+
+    <!-- MDX Content -->
+    <div class="prose prose-gray prose-lg max-w-none
+      prose-headings:font-bold prose-headings:text-gray-900
+      prose-h1:hidden
+      prose-a:text-blue-600 prose-a:font-semibold prose-a:no-underline hover:prose-a:underline
+      prose-blockquote:not-italic prose-blockquote:border-blue-400 prose-blockquote:bg-blue-50 prose-blockquote:rounded-xl prose-blockquote:py-1
+      prose-li:text-gray-700
+      prose-strong:text-gray-900
+      prose-hr:border-gray-200">
+      <Content />
+    </div>
+
+    <!-- Bottom CTA -->
+    <div class="mt-16 rounded-2xl border border-blue-100 bg-blue-50 p-8 text-center">
+      <p class="text-2xl font-extrabold text-gray-900 mb-2">Ready to pack smarter?</p>
+      <p class="text-gray-600 mb-6">Open this packing list in ReadyList. Everyone on the trip gets their own copy and tracks their own progress.</p>
+      <a
+        href="https://getreadylist.app"
+        class="inline-block rounded-xl px-8 py-3 font-bold text-white transition hover:opacity-90"
+        style="background: linear-gradient(135deg, #2563eb, #06b6d4)"
+      >
+        Open in ReadyList — it's free
+      </a>
+    </div>
+  </article>
+
+  <footer class="border-t border-gray-100 py-8 text-center text-sm text-gray-400">
+    <p>© 2026 ReadyList · <a href="https://getreadylist.app" class="hover:text-gray-600">getreadylist.app</a></p>
+  </footer>
+
+</body>
+</html>

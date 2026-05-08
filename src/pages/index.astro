@@ -1,0 +1,112 @@
+---
+import { getCollection } from 'astro:content';
+import '../styles/global.css';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+
+const title = 'Blog — ReadyList';
+const description = 'Guides, checklists, and tips for group travel and event planning from the ReadyList team.';
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonicalURL} />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonicalURL} />
+  <meta property="og:site_name" content="ReadyList" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+</head>
+<body class="bg-white min-h-screen">
+
+  <!-- Nav -->
+  <nav class="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur">
+    <div class="mx-auto max-w-4xl px-4 py-4 flex items-center justify-between">
+      <a href="https://getreadylist.app" class="flex items-center gap-2">
+        <span class="text-lg font-black tracking-tight bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+          ✅ ReadyList
+        </span>
+      </a>
+      <a href="https://getreadylist.app" class="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+        Back to app →
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="py-16 px-4" style="background: linear-gradient(135deg, #030213 0%, #1e3a8a 100%)">
+    <div class="mx-auto max-w-4xl text-center">
+      <p class="text-blue-300 text-sm font-semibold uppercase tracking-widest mb-4">ReadyList Blog</p>
+      <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl mb-4">
+        Checklists, guides &amp; tips
+      </h1>
+      <p class="text-lg text-blue-100 max-w-xl mx-auto">
+        Practical resources for group travel, event planning, and getting everyone on the same page.
+      </p>
+    </div>
+  </div>
+
+  <!-- Post grid -->
+  <div class="mx-auto max-w-4xl px-4 py-16">
+    {posts.length === 0 ? (
+      <p class="text-center text-gray-500">No posts yet.</p>
+    ) : (
+      <div class="grid gap-8 sm:grid-cols-2">
+        {posts.map((post) => (
+          <a
+            href={`/blog/${post.id}`}
+            class="group flex flex-col rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:shadow-md hover:border-blue-100"
+          >
+            <div class="mb-3 flex items-center gap-2">
+              <span class="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700">
+                Guide
+              </span>
+              <time class="text-xs text-gray-400" datetime={post.data.date}>
+                {new Date(post.data.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </time>
+            </div>
+            <h2 class="text-lg font-bold text-gray-900 group-hover:text-blue-700 transition-colors mb-2 leading-snug">
+              {post.data.title}
+            </h2>
+            <p class="text-sm text-gray-500 flex-1 leading-relaxed">{post.data.description}</p>
+            <div class="mt-4 flex items-center gap-1 text-sm font-semibold text-blue-600">
+              Read article →
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+
+  <!-- CTA -->
+  <div class="border-t border-gray-100 py-16 px-4">
+    <div class="mx-auto max-w-xl text-center">
+      <p class="text-2xl font-extrabold text-gray-900 mb-3">Plan your next trip with ReadyList</p>
+      <p class="text-gray-500 mb-6">Collaborative checklists where every person tracks their own progress.</p>
+      <a
+        href="https://getreadylist.app"
+        class="inline-block rounded-xl px-8 py-3 font-bold text-white transition hover:opacity-90"
+        style="background: linear-gradient(135deg, #2563eb, #06b6d4)"
+      >
+        Try ReadyList free →
+      </a>
+    </div>
+  </div>
+
+  <footer class="border-t border-gray-100 py-8 text-center text-sm text-gray-400">
+    <p>© 2026 ReadyList · <a href="https://getreadylist.app" class="hover:text-gray-600">getreadylist.app</a></p>
+  </footer>
+
+</body>
+</html>

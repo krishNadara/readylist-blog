@@ -1,0 +1,8 @@
+@import 'tailwindcss';
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-brand-navy: #030213;
+  --color-brand-blue: #2563eb;
+  --color-brand-cyan: #06b6d4;
+}
