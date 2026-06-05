@@ -13,11 +13,15 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await render(post);
 
-const { title, description, date } = post.data;
+const { title, description, date, ogImage, faqs } = post.data;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const formattedDate = new Date(date).toLocaleDateString('en-US', {
   year: 'numeric', month: 'long', day: 'numeric'
 });
+
+const ogImageURL = ogImage
+  ? new URL(ogImage, Astro.site).toString()
+  : new URL('/blog/og-default.png', Astro.site).toString();
 
 const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',
@@ -26,10 +30,21 @@ const jsonLd = JSON.stringify({
   description,
   datePublished: date,
   dateModified: date,
-  author: { '@type': 'Organization', name: 'ReadyList', url: 'https://getreadylist.app' },
+  image: ogImageURL,
+  author: { '@type': 'Person', name: 'ReadyList Team', url: 'https://getreadylist.app' },
   publisher: { '@type': 'Organization', name: 'ReadyList', url: 'https://getreadylist.app' },
-  mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalURL },
+  mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalURL.toString() },
 });
+
+const faqJsonLd = faqs && faqs.length > 0 ? JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map(({ q, a }) => ({
+    '@type': 'Question',
+    name: q,
+    acceptedAnswer: { '@type': 'Answer', text: a },
+  })),
+}) : null;
 ---
 
 <!DOCTYPE html>
@@ -45,10 +60,15 @@ const jsonLd = JSON.stringify({
   <meta property="og:description" content={description} />
   <meta property="og:url" content={canonicalURL} />
   <meta property="og:site_name" content="ReadyList" />
+  <meta property="og:image" content={ogImageURL} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content={title} />
   <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImageURL} />
   <script type="application/ld+json" set:html={jsonLd} />
+  {faqJsonLd && <script type="application/ld+json" set:html={faqJsonLd} />}
 </head>
 <body class="bg-white min-h-screen">
 

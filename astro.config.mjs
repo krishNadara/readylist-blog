@@ -6,6 +6,7 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   site: 'https://getreadylist.app',
   base: '/blog',
+  trailingSlash: 'never',
   integrations: [
     mdx(),
     sitemap(),
