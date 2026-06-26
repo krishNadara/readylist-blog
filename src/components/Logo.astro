@@ -1,0 +1,22 @@
+---
+// ReadyList brand logo — mirrors the main app's Logo component.
+interface Props {
+  href?: string;
+}
+const { href = 'https://getreadylist.app' } = Astro.props;
+---
+
+<a href={href} class="flex items-center gap-2.5 select-none no-underline">
+  <span class="w-7 h-7 rounded-xl bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-400 flex items-center justify-center shadow-md shadow-blue-300/40 flex-shrink-0">
+    <svg class="h-[15px] w-[15px]" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m3 17 2 2 4-4"/>
+      <path d="m3 7 2 2 4-4"/>
+      <path d="M13 6h8"/>
+      <path d="M13 12h8"/>
+      <path d="M13 18h8"/>
+    </svg>
+  </span>
+  <span class="text-base font-extrabold tracking-tight leading-none bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 bg-clip-text text-transparent">
+    ReadyList
+  </span>
+</a>
